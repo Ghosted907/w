@@ -1,5 +1,3 @@
-ضع هذا كـ `index.html` داخل نفس المستودع `https://waleedm0h.github.io/w/`:
-
 ```html
 <!doctype html>
 <html lang="ar" dir="rtl">
@@ -18,6 +16,7 @@
 
       --fixed:#0b2a5b;      /* ثابت = أزرق غامق */
       --var:#c1121f;        /* متغير = أحمر */
+
       --shadow: 0 12px 30px rgba(0,0,0,.08);
       --radius:16px;
     }
@@ -32,28 +31,21 @@
       -webkit-user-select:none;
       -ms-user-select:none;
     }
-    .wrap{max-width:1200px; margin:0 auto; padding:22px}
+
+    .wrap{max-width:900px; margin:0 auto; padding:18px}
+
     header{
       border:1px solid var(--line);
       border-radius: var(--radius);
-      padding:16px 16px;
+      padding:14px 14px;
       background: var(--panel2);
       box-shadow: var(--shadow);
-      display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
-      flex-wrap:wrap;
     }
-    header h1{margin:0; font-size:20px}
+    header h1{margin:0; font-size:18px}
     header p{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.7}
 
-    .grid{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns: 360px 1fr;
-      gap:14px;
-    }
-    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
-
     .card{
+      margin-top:12px;
       border:1px solid var(--line);
       border-radius: var(--radius);
       overflow:hidden;
@@ -69,118 +61,8 @@
     .hd h2{margin:0; font-size:14px}
     .bd{padding:12px}
 
-    .steps{display:flex; flex-direction:column; gap:10px}
-    .stepBtn{
-      width:100%;
-      text-align:right;
-      border:1px solid var(--line);
-      border-radius: 14px;
-      padding:12px 12px;
-      background: #fff;
-      cursor:pointer;
-      transition: transform .12s ease, border-color .12s ease;
-      display:flex; gap:10px; align-items:flex-start;
-    }
-    .stepBtn:hover{transform: translateY(-1px); border-color:#9ca3af}
-    .stepBtn.active{border-color: var(--fixed); outline:2px solid rgba(11,42,91,.12)}
-    .num{
-      min-width:30px; height:30px; border-radius:10px;
-      display:grid; place-items:center;
-      border:1px solid var(--line);
-      background: var(--panel);
-      color: var(--text);
-      font-weight:800;
-    }
-    .meta{display:flex; flex-direction:column; gap:4px}
-    .meta .t{font-weight:800; font-size:13px}
-    .meta .d{color:var(--muted); font-size:12px; line-height:1.55}
-
-    .panelTitle{margin:0 0 6px; font-size:18px}
-    .panelSub{margin:0 0 12px; color:var(--muted); font-size:13px; line-height:1.7}
-
-    .sec{margin-top:12px; padding-top:12px; border-top:1px dashed var(--line)}
-    .sec h3{margin:0 0 10px; font-size:13px}
-    ul{margin:0; padding:0 18px 0 0; color:var(--muted); font-size:13px; line-height:1.8}
-    li{margin:4px 0}
-
-    .code{
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:#fff;
-      overflow:hidden;
-    }
-    .code .top{
-      padding:10px 10px;
-      border-bottom:1px solid var(--line);
-      background: var(--panel);
-      font-size:12px;
-      color: var(--muted);
-      display:flex; justify-content:space-between; gap:10px; align-items:center;
-    }
-    pre{
-      margin:0;
-      padding:10px 12px;
-      white-space:pre-wrap;
-      word-break:break-word;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:12.5px;
-      line-height:1.8;
-      color: var(--text);
-    }
-
-    .fx{color: var(--fixed); font-weight:800}
+    .fx{color: var(--fixed); font-weight:900}
     .vr{color: var(--var); font-weight:900}
-
-    .mini{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-    }
-
-    .addons{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap:10px;
-    }
-    @media (max-width: 520px){ .addons{grid-template-columns:1fr} }
-    .addonBtn{
-      text-align:right;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px 12px;
-      background:#fff;
-      cursor:pointer;
-      transition: transform .12s ease, border-color .12s ease;
-    }
-    .addonBtn:hover{transform: translateY(-1px); border-color:#9ca3af}
-    .addonBtn .h{font-weight:900; font-size:13px}
-    .addonBtn .s{color:var(--muted); font-size:12px; margin-top:6px; line-height:1.55}
-
-    dialog{
-      border:none;
-      border-radius: 16px;
-      background:#fff;
-      width:min(950px, 94vw);
-      box-shadow: var(--shadow);
-      padding:0;
-    }
-    dialog::backdrop{background: rgba(0,0,0,.35)}
-    .mhd{
-      padding:12px 12px;
-      border-bottom:1px solid var(--line);
-      background: var(--panel);
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-    }
-    .mhd h3{margin:0; font-size:14px}
-    .mclose{
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:12px;
-      padding:8px 10px;
-      cursor:pointer;
-      font-size:12px;
-    }
-    .mbd{padding:12px}
 
     .hint{
       padding:10px 12px;
@@ -189,67 +71,113 @@
       background:#fff;
       color: var(--muted);
       font-size:12px;
-      line-height:1.8;
+      line-height:1.85;
     }
+
+    /* Accordion */
+    .acc{display:flex; flex-direction:column; gap:10px}
+    .accItem{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      overflow:hidden;
+    }
+    .accBtn{
+      width:100%;
+      text-align:right;
+      background:#fff;
+      border:none;
+      padding:12px 12px;
+      cursor:pointer;
+      display:flex; gap:10px; align-items:flex-start;
+    }
+    .accBtn:hover{background: rgba(243,244,246,.7)}
+    .num{
+      min-width:30px; height:30px; border-radius:10px;
+      display:grid; place-items:center;
+      border:1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      font-weight:900;
+    }
+    .meta{display:flex; flex-direction:column; gap:4px}
+    .meta .t{font-weight:900; font-size:13px}
+    .meta .d{color:var(--muted); font-size:12px; line-height:1.6}
+
+    .accBody{
+      border-top:1px solid var(--line);
+      background: #fff;
+      padding:12px 12px;
+      display:none;
+    }
+    .accItem.open .accBody{display:block}
+    .accItem.open{border-color: var(--fixed); outline:2px solid rgba(11,42,91,.10)}
+
+    .sec{margin-top:12px; padding-top:12px; border-top:1px dashed var(--line)}
+    .sec h3{margin:0 0 10px; font-size:13px}
+
+    .code{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      overflow:hidden;
+      margin-top:10px;
+    }
+    .code:first-child{margin-top:0}
+    .code .top{
+      padding:9px 10px;
+      border-bottom:1px solid var(--line);
+      background: var(--panel);
+      font-size:12px;
+      color: var(--muted);
+    }
+    pre{
+      margin:0;
+      padding:10px 12px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:12.5px;
+      line-height:1.85;
+      color: var(--text);
+    }
+
+    ul{margin:0; padding:0 18px 0 0; color:var(--muted); font-size:13px; line-height:1.9}
+    li{margin:4px 0}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div>
-        <h1>خطوات الحجز من البداية إلى النهاية</h1>
-        <p>
-          الثابت بالأزرق الغامق، والمتغير بالأحمر.
-        </p>
-      </div>
+      <h1>خطوات الحجز من البداية إلى النهاية</h1>
+      <p>الثابت بالأزرق الغامق، والمتغير بالأحمر.</p>
     </header>
 
-    <div class="grid">
-      <!-- القائمة -->
-      <section class="card">
-        <div class="hd"><h2>خطوات الحجز</h2></div>
-        <div class="bd">
-          <div class="steps" id="steps"></div>
+    <section class="card">
+      <div class="hd"><h2>خطوات الحجز</h2></div>
+      <div class="bd">
+        <div class="acc" id="steps"></div>
 
-          <div class="sec">
-            <h3>تنبيهات سريعة</h3>
-            <ul>
-              <li>إذا ظهرت: <span class="vr">NEED TICKETING ARGUMENTS</span> الحل: <span class="fx">TKOK</span></li>
-              <li>إذا ظهرت: <span class="vr">NEED TEST</span> الحل: <span class="fx">FXP</span></li>
-              <li>إذا ظهرت: <span class="vr">PREVIOUS TST EXISTS/SEGMENT OVERLAP</span> الحل: <span class="fx">TTE/ALL</span> ثم <span class="fx">TMX/ALL</span></li>
-              <li>إذا ظهرت: <span class="vr">TICKETING INHIBITED - SSR DOCS MISSING</span> لازم إضافة <span class="fx">SSR DOCS</span></li>
-              <li>بعد كل خطوة مهمة: <span class="fx">RFF</span> ثم <span class="fx">ER</span> ثم <span class="fx">ER</span></li>
-            </ul>
-          </div>
+        <div class="sec">
+          <h3>تنبيهات سريعة</h3>
+          <ul>
+            <li>إذا ظهرت: <span class="vr">NEED TICKETING ARGUMENTS</span> الحل: <span class="fx">TKOK</span></li>
+            <li>إذا ظهرت: <span class="vr">NEED TEST</span> الحل: <span class="fx">FXP</span></li>
+            <li>إذا ظهرت: <span class="vr">PREVIOUS TST EXISTS/SEGMENT OVERLAP</span> الحل: <span class="fx">TTE/ALL</span> ثم <span class="fx">TMX/ALL</span></li>
+            <li>إذا ظهرت: <span class="vr">TICKETING INHIBITED - SSR DOCS MISSING</span> لازم إضافة <span class="fx">SSR DOCS</span></li>
+            <li>بعد كل خطوة مهمة: <span class="fx">RFF</span> ثم <span class="fx">ER</span> ثم <span class="fx">ER</span></li>
+          </ul>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- التفاصيل -->
-      <section class="card">
-        <div class="hd"><h2 id="detailTitle">—</h2></div>
-        <div class="bd" id="detail">
-          <h2 class="panelTitle">اختر خطوة من اليسار</h2>
-          <p class="panelSub">—</p>
-        </div>
-      </section>
-    </div>
-
-    <!-- الإضافات -->
-    <section class="card" style="margin-top:14px">
+    <section class="card">
       <div class="hd"><h2>الإضافات</h2></div>
       <div class="bd">
-        <div class="addons" id="addons"></div>
+        <div class="acc" id="addons"></div>
       </div>
     </section>
   </div>
-
-  <dialog id="modal">
-    <div class="mhd">
-      <h3 id="mTitle">—</h3>
-      <button class="mclose" id="mClose" type="button">إغلاق</button>
-    </div>
-    <div class="mbd" id="mBody"></div>
-  </dialog>
 
   <script>
     // منع النسخ/القص/الزر الأيمن/اختصارات شائعة
@@ -266,47 +194,36 @@
     const stepsData = [
       {
         title: "الخطوة الأولى: تحديد مواعيد الرحلة",
-        desc: "تحديد التاريخ + المدن.",
-        html: `
-          <h2 class="panelTitle">الخطوة الأولى: تحديد مواعيد الرحلة</h2>
-          <p class="panelSub">التاريخ + مدينة الإقلاع + مدينة الوصول.</p>
-          <div class="mini">
-            <div class="code">
-              <div class="top">الأمر</div>
-              <pre><span class="fx">AN</span> <span class="vr">10FEB</span> <span class="vr">RUH</span> <span class="vr">LHR</span></pre>
-            </div>
-            <div class="hint">
-              <b class="fx">ملاحظة:</b> الأشهر تُكتب باختصار إنجليزي (JAN/FEB/MAR...).
-            </div>
+        desc: "التاريخ + مدينة الإقلاع + مدينة الوصول.",
+        body: `
+          <div class="code">
+            <div class="top">الأمر</div>
+            <pre><span class="fx">AN</span> <span class="vr">10FEB</span> <span class="vr">RUH</span> <span class="vr">LHR</span></pre>
+          </div>
+          <div class="hint" style="margin-top:10px">
+            <span class="fx">ملاحظة:</span> غيّر <span class="vr">10FEB / RUH / LHR</span> حسب طلب الضيف.
           </div>
         `
       },
       {
         title: "الخطوة الثانية: تحديد الدرجة وعدد المقاعد والباقة",
         desc: "تسعير ثم اختيار الباقة.",
-        html: `
-          <h2 class="panelTitle">الخطوة الثانية: تحديد الدرجة وعدد المقاعد والباقة</h2>
-          <p class="panelSub">بعد اختيار الرحلة، يتم التسعير ثم اختيار الباقة.</p>
-          <div class="mini">
-            <div class="code">
-              <div class="top">التسعير</div>
-              <pre><span class="fx">FXX</span></pre>
-            </div>
-            <div class="code">
-              <div class="top">اختيار الباقة</div>
-              <pre><span class="fx">FXX/FF-</span> <span class="vr">اختيار_الباقة</span></pre>
-            </div>
+        body: `
+          <div class="code">
+            <div class="top">التسعير</div>
+            <pre><span class="fx">FXX</span></pre>
+          </div>
+          <div class="code">
+            <div class="top">اختيار الباقة</div>
+            <pre><span class="fx">FXX/FF-</span> <span class="vr">اختيار_الباقة</span></pre>
           </div>
         `
       },
       {
         title: "الخطوة الثالثة: إضافة الأسماء",
         desc: "ذكر / أنثى / طفل / طفلة / رضيع (يربط مع بالغ).",
-        html: `
-          <h2 class="panelTitle">الخطوة الثالثة: إضافة الأسماء</h2>
-          <p class="panelSub">اختر الصيغة المناسبة حسب نوع المسافر.</p>
-
-          <div class="sec">
+        body: `
+          <div class="sec" style="border-top:none;padding-top:0;margin-top:0">
             <h3>ذكر</h3>
             <div class="code"><div class="top">NM1</div>
               <pre><span class="fx">NM1</span> <span class="vr">LASTNAME</span>/<span class="vr">FIRSTNAME</span> <span class="fx">MR</span></pre>
@@ -323,7 +240,7 @@
           <div class="sec">
             <h3>طفل</h3>
             <div class="code"><div class="top">NM1</div>
-              <pre><span class="fx">NM1</span> <span class="vr">LASTNAME</span>/<span class="vr">FIRSTNAME</span> <span class="fx">MSTR</span> (<span class="fx">CHD</span>/<span class="vr">DOB</span>)</pre>
+              <pre><span class="fx">NM1</span> <span class="vr">LASTNAME</span>/<span class="vr">FIRSTNAME</span> <span class="fx">MSTR</span> (<span class="fx">CHD</span>/<span class="vr">BOD</span>)</pre>
             </div>
           </div>
 
@@ -344,69 +261,58 @@
       },
       {
         title: "الخطوة الرابعة: التواصل + الوثائق + التثبيت + الدفع + التصدير",
-        desc: "بيانات التواصل ثم TKOK والحفظ ثم SSR DOCS ثم اختيار الباقة والدفع والتصدير.",
-        html: `
-          <h2 class="panelTitle">الخطوة الرابعة: التواصل + الوثائق + التثبيت + الدفع + التصدير</h2>
-          <p class="panelSub">رتّبها بنفس التسلسل التالي.</p>
-
-          <div class="sec">
-            <h3>بيانات التواصل</h3>
-            <div class="code"><div class="top">APM / APN / APE</div>
-              <pre>
+        desc: "APM/APN/APE ثم TKOK والحفظ ثم SSR DOCS ثم FXP/FF- ثم SADAD ثم التصدير.",
+        body: `
+          <div class="code">
+            <div class="top">بيانات التواصل</div>
+            <pre>
 <span class="fx">APM-SV/M+966</span><span class="vr">PHONENO</span><span class="fx">/P</span><span class="vr">1,2,3,4</span>
 <span class="fx">APN-SV/M+966</span><span class="vr">PHONENO</span><span class="fx">/P</span><span class="vr">1,2,3,4</span>
 <span class="fx">APE-</span><span class="vr">EMAIL</span>
-              </pre>
-            </div>
+            </pre>
+          </div>
 
-            <div class="code" style="margin-top:10px"><div class="top">TKOK + حفظ</div>
-              <pre>
+          <div class="code">
+            <div class="top">TKOK + الحفظ</div>
+            <pre>
 <span class="fx">TKOK</span>
 <span class="fx">RFF</span> &gt; <span class="fx">ER</span> &gt; <span class="fx">ER</span>
-              </pre>
-            </div>
+            </pre>
           </div>
 
-          <div class="sec">
-            <h3>وثائق السفر (SSR DOCS)</h3>
-            <div class="code"><div class="top">SR DOCS</div>
-              <pre>
+          <div class="code">
+            <div class="top">وثائق السفر (SSR DOCS)</div>
+            <pre>
 <span class="fx">SR DOCS SV HK1-</span><span class="vr">I</span><span class="fx">-</span><span class="vr">SAU</span><span class="fx">-</span><span class="vr">1000000006</span><span class="fx">-</span><span class="vr">SAU</span><span class="fx">-</span><span class="vr">14SEP92</span><span class="fx">-</span><span class="vr">M</span><span class="fx">-</span><span class="vr">12DEC30</span><span class="fx">-</span><span class="vr">LASTNAME</span>/<span class="vr">FIRSTNAME</span><span class="fx">/P</span><span class="vr">1</span>
 
-| |   |        |         |        |       |       |              |                    |
-| |   |        |         |        |       |       |              |                    |
-| |   |        |         |        |       |       |              |                    |
-نوع الوثيقة  بلد الإصدار  رقم الوثيقة  الجنسية  تاريخ الميلاد  الجنس  تاريخ الانتهاء   الاسم      رقم المسافر
-              </pre>
-            </div>
 
-            <div class="hint" style="margin-top:10px">
-              <b class="fx">نوع الوثيقة المستخدمه للسفر:</b>
-              <span class="vr">I</span>=هوية وطنية ، <span class="vr">A</span>=إقامة ، <span class="vr">P</span>=جواز سفر
-            </div>
+            </pre>
           </div>
 
-          <div class="sec">
-            <h3>تثبيت السعر + اختيار الباقة</h3>
-            <div class="code"><div class="top">FXP</div>
-              <pre><span class="fx">FXP</span></pre>
-            </div>
-            <div class="code" style="margin-top:10px"><div class="top">اختيار الباقة</div>
-              <pre><span class="fx">FXP/FF-</span> <span class="vr">اختيار_الباقة</span></pre>
-            </div>
+          <div class="hint">
+            <span class="fx">نوع الوثيقة:</span>
+            <span class="vr">I</span>=هوية وطنية ، <span class="vr">A</span>=إقامة ، <span class="vr">P</span>=جواز سفر
           </div>
 
-          <div class="sec">
-            <h3>الدفع + الحفظ + التصدير</h3>
-            <div class="code"><div class="top">FP + حفظ</div>
-              <pre>
+          <div class="code">
+            <div class="top">تثبيت السعر + اختيار الباقة</div>
+            <pre>
+<span class="fx">FXP</span>
+<span class="fx">FXP/FF-</span> <span class="vr">اختيار_الباقة</span>
+            </pre>
+          </div>
+
+          <div class="code">
+            <div class="top">الدفع + الحفظ</div>
+            <pre>
 <span class="fx">FP-SADAD</span>
 <span class="fx">RFF</span> &gt; <span class="fx">ER</span> &gt; <span class="fx">ER</span>
-              </pre>
-            </div>
-            <div class="code" style="margin-top:10px"><div class="top">التصدير</div>
-              <pre><span class="fx">TTP/RT</span></pre>
-            </div>
+            </pre>
+          </div>
+
+          <div class="code">
+            <div class="top">التصدير</div>
+            <pre><span class="fx">TTP/RT</span></pre>
           </div>
         `
       }
@@ -415,10 +321,8 @@
     const addOns = [
       {
         title: "خدمات مجانية",
-        short: "كرسي متحرك / سرير رضيع / كفيف / أصم",
-        html: `
-          <h2 class="panelTitle">الخدمات المجانية</h2>
-          <p class="panelSub">تضاف على الرحلة المطلوبة ورقم المسافر.</p>
+        desc: "كرسي متحرك / سرير رضيع / كفيف / أصم",
+        body: `
           <div class="code"><div class="top">أوامر</div><pre>
 <span class="fx">SR WCHR/S</span><span class="vr">#</span><span class="fx">/P</span><span class="vr">#</span>
 <span class="fx">SR WCHS/S</span><span class="vr">#</span><span class="fx">/P</span><span class="vr">#</span>
@@ -432,10 +336,8 @@
       },
       {
         title: "الوجبات",
-        short: "استعراض ثم إضافة كود الوجبة",
-        html: `
-          <h2 class="panelTitle">الوجبات</h2>
-          <p class="panelSub">استعرض القائمة ثم أضف كود الوجبة.</p>
+        desc: "استعراض ثم إضافة كود الوجبة",
+        body: `
           <div class="code"><div class="top">أوامر</div><pre>
 <span class="fx">HE MEAL</span>
 <span class="fx">MS22</span>
@@ -446,9 +348,8 @@
       },
       {
         title: "حقيبة مدفوعة (XBAG)",
-        short: "SR XBAG ثم خدمات ثم دفع بطاقة ثم TTM/RT",
-        html: `
-          <h2 class="panelTitle">حقيبة مدفوعة (XBAG)</h2>
+        desc: "SR XBAG ثم خدمات ثم دفع بطاقة ثم TTM/RT",
+        body: `
           <div class="code"><div class="top">أوامر</div><pre>
 <span class="fx">SR XBAG NN</span> <span class="vr">1</span><span class="fx">-TTL0KG1PC/S</span><span class="vr">#</span><span class="fx">/P</span><span class="vr">#</span>
 <span class="fx">TTE/ALL</span>
@@ -463,9 +364,8 @@
       },
       {
         title: "مقعد مدفوع (SEAT)",
-        short: "SM ثم خدمات ثم دفع بطاقة ثم TTM/RT",
-        html: `
-          <h2 class="panelTitle">مقعد مدفوع (SEAT)</h2>
+        desc: "SM ثم خدمات ثم دفع بطاقة ثم TTM/RT",
+        body: `
           <div class="code"><div class="top">أوامر</div><pre>
 <span class="fx">SM</span>
 <span class="fx">TTE/ALL</span>
@@ -480,70 +380,47 @@
       }
     ];
 
-    const stepsEl = document.getElementById("steps");
-    const detailTitle = document.getElementById("detailTitle");
-    const detailEl = document.getElementById("detail");
+    function buildAccordion(container, items){
+      container.innerHTML = "";
+      items.forEach((it, idx)=>{
+        const item = document.createElement("div");
+        item.className = "accItem";
 
-    function renderSteps(){
-      stepsEl.innerHTML = "";
-      stepsData.forEach((s, idx)=>{
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "stepBtn";
-        b.dataset.idx = idx;
-        b.innerHTML = `
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "accBtn";
+        btn.innerHTML = `
           <div class="num">${idx+1}</div>
           <div class="meta">
-            <div class="t">${s.title}</div>
-            <div class="d">${s.desc}</div>
+            <div class="t">${it.title}</div>
+            <div class="d">${it.desc}</div>
           </div>
         `;
-        b.addEventListener("click", ()=>selectStep(idx));
-        stepsEl.appendChild(b);
+
+        const body = document.createElement("div");
+        body.className = "accBody";
+        body.innerHTML = it.body;
+
+        btn.addEventListener("click", ()=>{
+          // افتح تحت نفس الخطوة + اقفل الباقي
+          const isOpen = item.classList.contains("open");
+          container.querySelectorAll(".accItem").forEach(x=>x.classList.remove("open"));
+          if(!isOpen) item.classList.add("open");
+        });
+
+        item.appendChild(btn);
+        item.appendChild(body);
+        container.appendChild(item);
       });
-      selectStep(0);
+
+      // افتح الأولى افتراضياً
+      const first = container.querySelector(".accItem");
+      if(first) first.classList.add("open");
     }
 
-    function selectStep(idx){
-      document.querySelectorAll(".stepBtn").forEach(x=>{
-        x.classList.toggle("active", Number(x.dataset.idx) === idx);
-      });
-      const s = stepsData[idx];
-      detailTitle.textContent = s.title;
-      detailEl.innerHTML = s.html;
-    }
-
-    // Addons modal
-    const addonsEl = document.getElementById("addons");
-    const modal = document.getElementById("modal");
-    const mTitle = document.getElementById("mTitle");
-    const mBody = document.getElementById("mBody");
-    document.getElementById("mClose").addEventListener("click", ()=>modal.close());
-
-    function openAddon(i){
-      const a = addOns[i];
-      mTitle.textContent = a.title;
-      mBody.innerHTML = a.html;
-      modal.showModal();
-    }
-
-    function renderAddons(){
-      addonsEl.innerHTML = "";
-      addOns.forEach((a, i)=>{
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "addonBtn";
-        b.innerHTML = `<div class="h">${a.title}</div><div class="s">${a.short}</div>`;
-        b.addEventListener("click", ()=>openAddon(i));
-        addonsEl.appendChild(b);
-      });
-    }
-
-    renderSteps();
-    renderAddons();
+    buildAccordion(document.getElementById("steps"), stepsData);
+    buildAccordion(document.getElementById("addons"), addOns);
   </script>
 </body>
 </html>
 ```
-
-تم إدراج “تنبيهات الأخطاء السريعة” (TKOK/FXP/TTE/ TMX/SSR DOCS) حسب مرجع الأخطاء. 
