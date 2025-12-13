@@ -1,4 +1,4 @@
-```html
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -144,6 +144,21 @@
 
     ul{margin:0; padding:0 18px 0 0; color:var(--muted); font-size:13px; line-height:1.9}
     li{margin:4px 0}
+
+    /* Reference block toggle (new block) */
+    .btnToggle{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:12px;
+      padding:8px 10px;
+      cursor:pointer;
+      font-size:12px;
+      color: var(--text);
+      white-space:nowrap;
+    }
+    .btnToggle:hover{background: rgba(255,255,255,.85)}
+    .refBody{display:none}
+    .refBody.open{display:block}
   </style>
 </head>
 <body>
@@ -175,6 +190,105 @@
       <div class="hd"><h2>الإضافات</h2></div>
       <div class="bd">
         <div class="acc" id="addons"></div>
+      </div>
+    </section>
+
+    <!-- NEW BLOCK: Reference (opens by button) -->
+    <section class="card" id="refCard">
+      <div class="hd">
+        <h2>مرجع الإدخالات</h2>
+        <button class="btnToggle" id="refBtn" type="button">فتح</button>
+      </div>
+      <div class="bd">
+        <div class="refBody" id="refBody">
+          <div class="hint">الأحمر متغير (أرقام/PNR/تذكرة/سطر/جوال/عضوية…)</div>
+
+          <div class="sec">
+            <h3>استعراض الحجز / التذكرة / القسيمة</h3>
+            <div class="code"><div class="top">PNR / TKT / EMD</div><pre>
+<span class="fx">RT</span> <span class="vr">###########</span>
+<span class="fx">RT</span> <span class="fx">TKT</span>/<span class="vr">065-2###</span>
+<span class="fx">TWD</span> / <span class="fx">TKT</span> <span class="vr">065-2##</span>
+<span class="fx">EWD</span> / <span class="fx">EMD</span> <span class="vr">065-4##</span>
+
+<span class="fx">TWD</span> / <span class="fx">ORG</span><span class="vr">966####</span>
+<span class="fx">EWD</span> / <span class="vr">-966####</span>
+
+<span class="fx">RTM</span> / <span class="fx">SV</span><span class="vr">####</span>
+<span class="fx">TWD</span> / <span class="fx">O*</span>
+
+<span class="fx">TWD</span> / <span class="fx">L</span> <span class="vr">#</span>
+<span class="fx">EWD</span> / <span class="fx">L</span> <span class="vr">#</span>
+
+<span class="fx">TWD</span> / <span class="fx">XT</span>
+<span class="fx">TWH</span> / <span class="fx">XT</span>
+            </pre></div>
+          </div>
+
+          <div class="sec">
+            <h3>قراءات داخل الحجز</h3>
+            <div class="code"><div class="top">داخل PNR</div><pre>
+<span class="fx">RT*E</span>
+<span class="fx">DD</span> <span class="vr">RUH</span>
+<span class="fx">IR</span>
+<span class="fx">RTSTR</span>
+<span class="fx">RTJ</span>
+<span class="fx">RHG</span>
+<span class="fx">RTF</span>
+<span class="fx">RHI</span>
+<span class="fx">RHF</span>
+<span class="fx">AXR RT</span>
+<span class="fx">RTR</span>
+<span class="fx">TDD</span>
+            </pre></div>
+          </div>
+
+          <div class="sec">
+            <h3>إرسال تفاصيل للضيف</h3>
+            <div class="code"><div class="top">Email</div><pre>
+<span class="fx">ITR-EMLA</span>
+<span class="fx">IEP-EMLA</span>
+
+<span class="vr">#</span><span class="fx">TKT</span>/<span class="fx">TWD</span>../<span class="fx">EML</span>/<span class="fx">FWD</span>/<span class="fx">WM</span>
+<span class="vr">#</span><span class="fx">EMD</span>/<span class="fx">EWD</span>../<span class="fx">EML</span>/<span class="fx">FWD</span>/<span class="fx">WM</span>
+            </pre></div>
+          </div>
+
+          <div class="sec">
+            <h3>تحويلات الأكواد</h3>
+            <div class="code"><div class="top">Codes</div><pre>
+<span class="fx">DC</span> <span class="vr">saudiarabia</span>
+<span class="fx">DAC</span> <span class="vr">sau</span>
+<span class="fx">DAN</span> <span class="vr">Riyadh</span>
+<span class="fx">DNA</span> <span class="vr">Riyadh</span>
+            </pre></div>
+          </div>
+
+          <div class="sec">
+            <h3>فرسان</h3>
+            <div class="code"><div class="top">FQTV</div><pre>
+<span class="fx">PDAP</span> / <span class="fx">PHONE-</span><span class="vr">966####</span>
+<span class="fx">FFD</span> <span class="fx">SV-</span><span class="vr">####</span>
+<span class="fx">FFA</span> <span class="fx">SV-</span><span class="vr">####</span>
+<span class="fx">FFN</span> <span class="fx">SV-</span><span class="vr">####</span>
+            </pre></div>
+          </div>
+
+          <div class="sec">
+            <h3>جهات تواصل (مرجع)</h3>
+            <div class="code"><div class="top">Contact</div><pre>
+<span class="fx">920022222</span>
+<span class="fx">920000488</span>
+<span class="fx">126862000</span>
+<span class="fx">920003111</span>
+
+<span class="fx">ruhextencya@saudia.com</span>
+<span class="fx">GRPS@saudia.com</span>
+<span class="fx">cmcsv@sa.extensya.com</span>
+<span class="fx">KSASVQuality@sa.extensya.com</span>
+            </pre></div>
+          </div>
+        </div>
       </div>
     </section>
   </div>
@@ -285,7 +399,8 @@
             <pre>
 <span class="fx">SR DOCS SV HK1-</span><span class="vr">I</span><span class="fx">-</span><span class="vr">SAU</span><span class="fx">-</span><span class="vr">1000000006</span><span class="fx">-</span><span class="vr">SAU</span><span class="fx">-</span><span class="vr">14SEP92</span><span class="fx">-</span><span class="vr">M</span><span class="fx">-</span><span class="vr">12DEC30</span><span class="fx">-</span><span class="vr">LASTNAME</span>/<span class="vr">FIRSTNAME</span><span class="fx">/P</span><span class="vr">1</span>
 
-
+| |   |        |         |        |       |       |              |                    |
+نوع الوثيقة  بلد الإصدار  رقم الوثيقة  الجنسية  تاريخ الميلاد  الجنس  تاريخ الانتهاء   الاسم      رقم المسافر
             </pre>
           </div>
 
@@ -402,7 +517,6 @@
         body.innerHTML = it.body;
 
         btn.addEventListener("click", ()=>{
-          // افتح تحت نفس الخطوة + اقفل الباقي
           const isOpen = item.classList.contains("open");
           container.querySelectorAll(".accItem").forEach(x=>x.classList.remove("open"));
           if(!isOpen) item.classList.add("open");
@@ -413,14 +527,21 @@
         container.appendChild(item);
       });
 
-      // افتح الأولى افتراضياً
       const first = container.querySelector(".accItem");
       if(first) first.classList.add("open");
     }
 
     buildAccordion(document.getElementById("steps"), stepsData);
     buildAccordion(document.getElementById("addons"), addOns);
+
+    // NEW BLOCK toggle (no impact on existing blocks)
+    const refBtn = document.getElementById("refBtn");
+    const refBody = document.getElementById("refBody");
+    refBtn.addEventListener("click", ()=>{
+      const open = refBody.classList.toggle("open");
+      refBtn.textContent = open ? "إغلاق" : "فتح";
+    });
   </script>
 </body>
 </html>
-```
+
