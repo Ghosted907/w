@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Altéa Read‑Only Coach",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Read-only coach: PNR/Ticket summary panel + command suggestions. No auto-fill, no edits.",
   "permissions": [
     "activeTab",

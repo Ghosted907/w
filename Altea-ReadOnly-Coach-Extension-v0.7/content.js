@@ -66,226 +66,307 @@
 
   // ---- Extract PNR locator, office, timestamp ----
   function parsePnrHeader(rawText) {
-    const lines = rawText.split("\n").map(l => l.trim());
-    const rpLine = lines.find(l => /^RP\//i.test(l));
-    if (!rpLine) return null;
+    try {
+      const lines = rawText.split("\n").map(l => l.trim());
+      const rpLine = lines.find(l => /^RP\//i.test(l));
+      if (!rpLine) return null;
 
-    // Locator often last token on RP line
-    const tokens = rpLine.split(/\s+/).filter(Boolean);
-    const locator = tokens.length ? tokens[tokens.length-1] : "";
+      // Locator often last token on RP line
+      const tokens = rpLine.split(/\s+/).filter(Boolean);
+      const locator = tokens.length ? tokens[tokens.length-1] : "";
 
-    // timestamp pattern 13DEC25/0942Z
-    const tsMatch = rpLine.match(/\b(\d{1,2}[A-Z]{3}\d{2})\/(\d{4}Z)\b/i);
-    const stamp = tsMatch ? `${tsMatch[1].toUpperCase()} ${tsMatch[2].toUpperCase()}` : "";
+      // timestamp pattern 13DEC25/0942Z
+      const tsMatch = rpLine.match(/\b(\d{1,2}[A-Z]{3}\d{2})\/(\d{4}Z)\b/i);
+      const stamp = tsMatch ? `${tsMatch[1].toUpperCase()} ${tsMatch[2].toUpperCase()}` : "";
 
-    return { locator, stamp, rpLine };
+      return { locator, stamp, rpLine };
+    } catch (e) {
+      console.warn("[Altea Coach] parsePnrHeader error:", e);
+      return null;
+    }
   }
 
   // ---- Name extraction (supports multiple names per line) ----
   function extractPaxEntriesFromPnr(rawText) {
-    const lines = rawText.split("\n");
-    const rpIdx = lines.findIndex(l => /\bRP\//i.test(l));
-    if (rpIdx < 0) return [];
+    try {
+      const lines = rawText.split("\n");
+      const rpIdx = lines.findIndex(l => /\bRP\//i.test(l));
+      if (rpIdx < 0) return [];
 
-    const segIdx = lines.findIndex((l, i) => i > rpIdx && /^\s*\d+\s+[A-Z0-9]{2}\s+\d{2,4}\b/.test(l));
-    const endIdx = (segIdx > 0) ? segIdx : Math.min(lines.length, rpIdx + 30);
+      const segIdx = lines.findIndex((l, i) => i > rpIdx && /^\s*\d+\s+[A-Z0-9]{2}\s+\d{2,4}\b/.test(l));
+      const endIdx = (segIdx > 0) ? segIdx : Math.min(lines.length, rpIdx + 30);
 
-    const nameBlock = lines.slice(rpIdx, endIdx).join(" ").replace(/\s+/g, " ").trim();
+      const nameBlock = lines.slice(rpIdx, endIdx).join(" ").replace(/\s+/g, " ").trim();
 
-    const pax = [];
-    const re = /(?:^|\s)(\d+)\.([A-Z0-9'\-]+\/[A-Z0-9'\-]+)(.*?)(?=(?:\s+\d+\.[A-Z0-9'\-]+\/[A-Z0-9'\-]+)|$)/gi;
-    let m;
-    while ((m = re.exec(nameBlock)) !== null) {
-      pax.push({ num: parseInt(m[1],10), name: m[2], tail: (m[3] || "").trim() });
+      const pax = [];
+      // Improved regex: supports Arabic names in Latin, special chars, spaces in names
+      const re = /(?:^|\s)(\d+)\.([A-Z0-9'\-\s]+\/[A-Z0-9'\-\s]+?)(?:\s+(?:MR|MS|MRS|MSTR|MISS))?(\([^)]*\))?\s*(?=\d+\.|$)/gi;
+      let m;
+      while ((m = re.exec(nameBlock)) !== null) {
+        pax.push({ num: parseInt(m[1],10), name: m[2].trim(), tail: (m[3] || "").trim() });
+      }
+
+      // Fallback to original pattern if no matches
+      if (pax.length === 0) {
+        const reFallback = /(?:^|\s)(\d+)\.([A-Z0-9'\-]+\/[A-Z0-9'\-]+)(.*?)(?=(?:\s+\d+\.[A-Z0-9'\-]+\/[A-Z0-9'\-]+)|$)/gi;
+        while ((m = reFallback.exec(nameBlock)) !== null) {
+          pax.push({ num: parseInt(m[1],10), name: m[2], tail: (m[3] || "").trim() });
+        }
+      }
+
+      return pax.sort((a,b)=>a.num-b.num);
+    } catch (e) {
+      console.warn("[Altea Coach] extractPaxEntriesFromPnr error:", e);
+      return [];
     }
-    return pax.sort((a,b)=>a.num-b.num);
   }
 
   function countPaxTypes(paxEntries) {
-    let adults = 0, children = 0, infants = 0;
-    for (const p of paxEntries) {
-      const token = `${p.name} ${p.tail}`.toUpperCase();
-      const hasChd = /\(CHD\//i.test(token);
-      const hasInf = /\(INF/i.test(token);
-      if (hasChd) children += 1;
-      else adults += 1;
-      if (hasInf) infants += 1;
+    try {
+      let adults = 0, children = 0, infants = 0;
+      for (const p of paxEntries) {
+        const token = `${p.name} ${p.tail}`.toUpperCase();
+        // CHD patterns: (CHD/19DEC18), (CHD), CHD
+        const hasChd = /\(CHD[\)/]|\bCHD\b/i.test(token);
+        // INF patterns: (INF...), (INFNAME/...), INF
+        const hasInf = /\(INF|\bINF\b/i.test(token);
+        if (hasChd) children += 1;
+        else adults += 1;
+        if (hasInf) infants += 1;
+      }
+      return { adults, children, infants, total: paxEntries.length };
+    } catch (e) {
+      console.warn("[Altea Coach] countPaxTypes error:", e);
+      return { adults: 0, children: 0, infants: 0, total: 0 };
     }
-    return { adults, children, infants, total: paxEntries.length };
   }
 
   // ---- Segment extraction ----
   function parseSegments(rawText) {
-    const lines = rawText.split("\n").map(l => l.replace(/\s+$/,""));
-    const segs = [];
-    const statusRe = /\b(HK|NN|HL|HN|RR|SS|UC|US)(\d+)\b/g;
+    try {
+      const lines = rawText.split("\n").map(l => l.replace(/\s+$/,""));
+      const segs = [];
+      const statusRe = /\b(HK|NN|HL|HN|RR|SS|UC|US|TK|KK|KL|WK|WL|DK|NO|SC|UN|HX|AK|RQ|SA|SB)(\d+)\b/g;
 
-    for (const l of lines) {
-      if (!/^\s*\d+\s+[A-Z0-9]{2}\s+\d{2,4}\b/.test(l)) continue;
+      for (const l of lines) {
+        if (!/^\s*\d+\s+[A-Z0-9]{2}\s+\d{2,4}\b/.test(l)) continue;
 
-      // Example: "3  SV 111 V 10FEB 2 RUHLHR HK2       4  0305 0730   *1A/E*"
-      const m = l.match(/^\s*(\d+)\s+([A-Z0-9]{2})\s+(\d{2,4})\s+([A-Z])\s+(\d{1,2}[A-Z]{3})\s+\d+\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)?\s*(.*)$/i);
-      // m[8] may not always match, so use statusRe separately
-      let st = null;
-      statusRe.lastIndex = 0;
-      const sts = [];
-      let sm;
-      while ((sm = statusRe.exec(l)) !== null) sts.push({ st: sm[1], n: parseInt(sm[2],10) });
+        // Pattern 1: Full format "3  SV 111 V 10FEB 2 RUHLHR HK2  0305 0730 *1A/E*"
+        const m = l.match(/^\s*(\d+)\s+([A-Z0-9]{2})\s+(\d{2,4})\s+([A-Z])\s+(\d{1,2}[A-Z]{3})\s*\d*\s+([A-Z]{3})([A-Z]{3})\s*([A-Z]{2}\d+)?\s*(.*)$/i);
 
-      const depArr = l.match(/\b(\d{4})\s+(\d{4})\b/);
-      const dep = depArr ? depArr[1] : "";
-      const arr = depArr ? depArr[2] : "";
+        statusRe.lastIndex = 0;
+        const sts = [];
+        let sm;
+        while ((sm = statusRe.exec(l)) !== null) sts.push({ st: sm[1], n: parseInt(sm[2],10) });
 
-      const first = sts[0] || null;
-      const hk = sts.find(x=>x.st==="HK");
+        const depArr = l.match(/\b(\d{4})\s+(\d{4})\b/);
+        const dep = depArr ? depArr[1] : "";
+        const arr = depArr ? depArr[2] : "";
 
-      if (m) {
-        segs.push({
-          seg: m[1],
-          carrier: m[2],
-          flight: m[3],
-          rbd: m[4],
-          date: m[5].toUpperCase(),
-          from: m[6].toUpperCase(),
-          to: m[7].toUpperCase(),
-          dep, arr,
-          statuses: sts,
-          hkParty: hk ? hk.n : 0,
-          firstStatus: first ? `${first.st}${first.n}` : ""
-        });
-      } else {
-        const sm2 = l.match(/^\s*(\d+)\s+([A-Z0-9]{2})\s+(\d{2,4}).*?\b([A-Z]{3})([A-Z]{3})\b/i);
-        if (sm2) {
+        const first = sts[0] || null;
+        const hk = sts.find(x=>x.st==="HK");
+
+        if (m) {
           segs.push({
-            seg: sm2[1],
-            carrier: sm2[2],
-            flight: sm2[3],
-            rbd: "",
-            date: "",
-            from: sm2[4].toUpperCase(),
-            to: sm2[5].toUpperCase(),
+            seg: m[1],
+            carrier: m[2],
+            flight: m[3],
+            rbd: m[4],
+            date: m[5].toUpperCase(),
+            from: m[6].toUpperCase(),
+            to: m[7].toUpperCase(),
             dep, arr,
             statuses: sts,
-            hkParty: (sts.find(x=>x.st==="HK")?.n)||0,
-            firstStatus: (sts[0] ? `${sts[0].st}${sts[0].n}` : "")
+            hkParty: hk ? hk.n : 0,
+            firstStatus: first ? `${first.st}${first.n}` : ""
           });
+        } else {
+          // Pattern 2: Simpler format fallback
+          const sm2 = l.match(/^\s*(\d+)\s+([A-Z0-9]{2})\s+(\d{2,4}).*?\b([A-Z]{3})([A-Z]{3})\b/i);
+          if (sm2) {
+            // Try to extract date from the line
+            const dateMatch = l.match(/\b(\d{1,2}[A-Z]{3})\b/i);
+            segs.push({
+              seg: sm2[1],
+              carrier: sm2[2],
+              flight: sm2[3],
+              rbd: "",
+              date: dateMatch ? dateMatch[1].toUpperCase() : "",
+              from: sm2[4].toUpperCase(),
+              to: sm2[5].toUpperCase(),
+              dep, arr,
+              statuses: sts,
+              hkParty: (sts.find(x=>x.st==="HK")?.n)||0,
+              firstStatus: (sts[0] ? `${sts[0].st}${sts[0].n}` : "")
+            });
+          }
         }
       }
+      return segs;
+    } catch (e) {
+      console.warn("[Altea Coach] parseSegments error:", e);
+      return [];
     }
-    return segs;
   }
 
   // HK group size should be compared per segment (max HK in segments)
   function computeHkParty(segs) {
-    const hk = segs.map(s=>s.hkParty||0).filter(n=>n>0);
-    return hk.length ? Math.max(...hk) : 0;
+    try {
+      if (!segs || !segs.length) return 0;
+      const hk = segs.map(s=>s.hkParty||0).filter(n=>n>0);
+      return hk.length ? Math.max(...hk) : 0;
+    } catch (e) {
+      console.warn("[Altea Coach] computeHkParty error:", e);
+      return 0;
+    }
   }
 
   // ---- OPC deadline ----
   function parseOpc(rawText) {
-    const m = rawText.match(/\bOPC-(\d{1,2}[A-Z]{3}):(\d{4})\b/i);
-    if (!m) return null;
-    return { date: m[1].toUpperCase(), time: m[2], raw: m[0] };
+    try {
+      // Support multiple OPC formats: OPC-15JAN:1200, TL-15JAN/1200
+      const m = rawText.match(/\b(?:OPC|TL)[-\/](\d{1,2}[A-Z]{3})(?:\/|:)(\d{4})\b/i);
+      if (!m) return null;
+      return { date: m[1].toUpperCase(), time: m[2], raw: m[0] };
+    } catch (e) {
+      console.warn("[Altea Coach] parseOpc error:", e);
+      return null;
+    }
   }
 
   // ---- Payment ----
   function parseFp(rawText) {
-    const m = rawText.match(/\bFP\s+([A-Z0-9\-\/]+)\b/i);
-    return m ? m[1].toUpperCase() : "";
+    try {
+      const m = rawText.match(/\bFP\s+([A-Z0-9\-\/\s]+?)(?:\s{2,}|$)/i);
+      return m ? m[1].trim().toUpperCase() : "";
+    } catch (e) {
+      console.warn("[Altea Coach] parseFp error:", e);
+      return "";
+    }
   }
 
   // ---- DOCS presence ----
   function hasDocs(rawText) {
-    return /\bSSR\s+DOCS\b/i.test(rawText);
+    try {
+      return /\bSSR\s+DOCS\b/i.test(rawText);
+    } catch (e) {
+      return false;
+    }
   }
 
   // ---- Tickets referenced ----
   function parseTicketRefs(rawText) {
-    const tix = new Set();
-    const re1 = /\b(\d{3}-\d{10})\b/g;
-    let m;
-    while ((m = re1.exec(rawText)) !== null) tix.add(m[1]);
-    const re2 = /\bFA\s+PAX\s+(\d{3}-\d{10})\b/gi;
-    while ((m = re2.exec(rawText)) !== null) tix.add(m[1]);
-    return Array.from(tix);
+    try {
+      const tix = new Set();
+      const re1 = /\b(\d{3}-\d{10})\b/g;
+      let m;
+      while ((m = re1.exec(rawText)) !== null) tix.add(m[1]);
+      const re2 = /\bFA\s+PAX\s+(\d{3}-\d{10})\b/gi;
+      while ((m = re2.exec(rawText)) !== null) tix.add(m[1]);
+      // Also match ticket numbers without dash: 0652188718468
+      const re3 = /\b(065\d{10})\b/g;
+      while ((m = re3.exec(rawText)) !== null) {
+        tix.add(m[1].slice(0,3) + "-" + m[1].slice(3));
+      }
+      return Array.from(tix);
+    } catch (e) {
+      console.warn("[Altea Coach] parseTicketRefs error:", e);
+      return [];
+    }
   }
 
   // ---- Pricing parsing (fare table + fare families) ----
   function parsePricing(rawText) {
-    const amounts = [];
-    if (/FARE<\s*SAR\s*>/i.test(rawText)) {
-      const r = /\*\s*([0-9]{1,7}\.[0-9]{2})\s*\*/g;
-      let m;
-      while ((m = r.exec(rawText)) !== null) amounts.push(m[1]);
-    }
-    const fam = [];
-    const famRe = /\*?\d*\*?\s*FARE\s+FAMILIES:\s*([A-Z0-9]+)\b/gi;
-    let fm;
-    while ((fm = famRe.exec(rawText)) !== null) fam.push(fm[1].toUpperCase());
+    try {
+      const amounts = [];
+      // Support multiple fare display formats
+      if (/FARE|TOTAL|SAR|USD|EUR/i.test(rawText)) {
+        const r = /\*?\s*([0-9]{1,7}\.[0-9]{2})\s*\*?/g;
+        let m;
+        while ((m = r.exec(rawText)) !== null) amounts.push(m[1]);
+      }
+      const fam = [];
+      const famRe = /\*?\d*\*?\s*FARE\s+FAMIL(?:Y|IES):\s*([A-Z0-9]+)\b/gi;
+      let fm;
+      while ((fm = famRe.exec(rawText)) !== null) fam.push(fm[1].toUpperCase());
 
-    const nums = amounts.map(a=>parseFloat(a)).filter(n=>!Number.isNaN(n));
-    const max = nums.length ? Math.max(...nums) : null;
-    return { found: amounts.length>0 || fam.length>0, amounts: amounts.slice(0, 8), max, families: Array.from(new Set(fam)).slice(0, 8) };
+      const nums = amounts.map(a=>parseFloat(a)).filter(n=>!Number.isNaN(n) && n > 0);
+      const max = nums.length ? Math.max(...nums) : null;
+      return { found: amounts.length>0 || fam.length>0, amounts: amounts.slice(0, 8), max, families: Array.from(new Set(fam)).slice(0, 8) };
+    } catch (e) {
+      console.warn("[Altea Coach] parsePricing error:", e);
+      return { found: false, amounts: [], max: null, families: [] };
+    }
   }
 
   function inferStateFromOutput(rawText, state) {
-    if (/\bRP\//i.test(rawText)) state.hasPnr = true;
-    if (/^\s*\d+\s+[A-Z0-9]{2}\s+\d{2,4}\b/m.test(rawText)) state.hasSell = true;
+    try {
+      if (/\bRP\//i.test(rawText)) state.hasPnr = true;
+      if (/^\s*\d+\s+[A-Z0-9]{2}\s+\d{2,4}\b/m.test(rawText)) state.hasSell = true;
 
-    const pax = extractPaxEntriesFromPnr(rawText);
-    if (pax.length) state.hasNames = true;
+      const pax = extractPaxEntriesFromPnr(rawText);
+      if (pax.length) state.hasNames = true;
 
-    if (/\bAPE\b|\bAPM\b|\bAPN\b/i.test(rawText)) state.hasContact = true;
-    if (/\bTK\s+OK\b/i.test(rawText)) state.hasTkOk = true;
-    if (hasDocs(rawText)) state.hasDocs = true;
-    if (/\bFP\s+/i.test(rawText)) state.hasPayment = true;
-    if (/\bRF\b/i.test(rawText)) state.hasSaved = true;
+      // Contact: APE (email), APM (mobile shared), APN (mobile per pax), AP- format
+      if (/\b(APE|APM|APN|AP\s*-)\b/i.test(rawText)) state.hasContact = true;
+      if (/\bTK\s*(OK|TL)\b/i.test(rawText)) state.hasTkOk = true;
+      if (hasDocs(rawText)) state.hasDocs = true;
+      if (/\bFP\s+[A-Z]/i.test(rawText)) state.hasPayment = true;
+      if (/\bRF\s*[A-Z]/i.test(rawText)) state.hasSaved = true;
 
-    if (/\bFXP\b|\bFXX\b|\bFARE<\s*SAR\s*>/i.test(rawText)) state.hasPricing = true;
-    if (/\bTST\b/i.test(rawText)) state.hasTst = true; // only if visible
+      if (/\bFXP\b|\bFXX\b|\bFARE|TST\s*\d/i.test(rawText)) state.hasPricing = true;
+      if (/\bTST\s*\d|\bTQT\b/i.test(rawText)) state.hasTst = true;
+    } catch (e) {
+      console.warn("[Altea Coach] inferStateFromOutput error:", e);
+    }
   }
 
   function buildSummary(rawText) {
-    const header = parsePnrHeader(rawText);
-    const paxEntries = extractPaxEntriesFromPnr(rawText);
-    const paxCounts = countPaxTypes(paxEntries);
+    try {
+      const header = parsePnrHeader(rawText);
+      const paxEntries = extractPaxEntriesFromPnr(rawText);
+      const paxCounts = countPaxTypes(paxEntries);
 
-    const segs = parseSegments(rawText);
-    const hkParty = computeHkParty(segs);
-    const paxSeats = paxCounts.adults + paxCounts.children;
+      const segs = parseSegments(rawText);
+      const hkParty = computeHkParty(segs);
+      const paxSeats = paxCounts.adults + paxCounts.children;
 
-    const opc = parseOpc(rawText);
-    const fp = parseFp(rawText);
-    const docsOk = hasDocs(rawText);
-    const tix = parseTicketRefs(rawText);
-    const pricing = parsePricing(rawText);
+      const opc = parseOpc(rawText);
+      const fp = parseFp(rawText);
+      const docsOk = hasDocs(rawText);
+      const tix = parseTicketRefs(rawText);
+      const pricing = parsePricing(rawText);
 
-    const lines = [];
-    if (header?.locator) lines.push(`PNR: ${header.locator}${header.stamp ? ` | وقت/سجل: ${header.stamp}` : ""}`);
-    if (paxCounts.total) lines.push(`المسافرون: ${paxCounts.total} (بالغ=${paxCounts.adults} | طفل=${paxCounts.children} | رضيع=${paxCounts.infants})`);
-    if (hkParty) {
-      const mismatch = (hkParty !== paxSeats) ? ` ⚠ فرق=${Math.abs(hkParty - paxSeats)}` : " ✓";
-      lines.push(`المقاعد المؤكدة HK: ${hkParty} | مقاعد حسب الأسماء: ${paxSeats}${mismatch}`);
-    }
-    if (segs.length) {
-      for (const s of segs.slice(0, 5)) {
-        const rbd = s.rbd ? ` ${s.rbd}` : "";
-        const d = s.date ? ` ${s.date}` : "";
-        const times = (s.dep && s.arr) ? ` ${s.dep}-${s.arr}` : "";
-        const st = s.firstStatus ? ` ${s.firstStatus}` : "";
-        lines.push(`S${s.seg}: ${s.carrier}${s.flight}${rbd}${d} ${s.from}-${s.to}${times}${st}`.trim());
+      const lines = [];
+      if (header?.locator) lines.push(`PNR: ${header.locator}${header.stamp ? ` | وقت/سجل: ${header.stamp}` : ""}`);
+      if (paxCounts.total) lines.push(`المسافرون: ${paxCounts.total} (بالغ=${paxCounts.adults} | طفل=${paxCounts.children} | رضيع=${paxCounts.infants})`);
+      if (hkParty) {
+        const mismatch = (hkParty !== paxSeats) ? ` ⚠ فرق=${Math.abs(hkParty - paxSeats)}` : " ✓";
+        lines.push(`المقاعد المؤكدة HK: ${hkParty} | مقاعد حسب الأسماء: ${paxSeats}${mismatch}`);
       }
-      if (segs.length > 5) lines.push(`... (${segs.length} segments)`);
-    }
-    if (opc) lines.push(`مهلة الإصدار (OPC): ${opc.date} ${opc.time}`);
-    if (docsOk) lines.push(`DOCS: موجود ✓`);
-    else if (header) lines.push(`DOCS: غير موجود ⚠`);
-    if (fp) lines.push(`الدفع FP: ${fp}`);
-    if (tix.length) lines.push(`تذاكر مرصودة: ${tix.slice(0,4).join(", ")}${tix.length>4 ? "..." : ""}`);
-    if (pricing.families.length) lines.push(`Fare Family: ${pricing.families.join(", ")}`);
-    if (pricing.max !== null) lines.push(`أعلى مبلغ ظاهر: SAR ${pricing.max.toFixed(2)}`);
+      if (segs.length) {
+        for (const s of segs.slice(0, 5)) {
+          const rbd = s.rbd ? ` ${s.rbd}` : "";
+          const d = s.date ? ` ${s.date}` : "";
+          const times = (s.dep && s.arr) ? ` ${s.dep}-${s.arr}` : "";
+          const st = s.firstStatus ? ` ${s.firstStatus}` : "";
+          lines.push(`S${s.seg}: ${s.carrier}${s.flight}${rbd}${d} ${s.from}-${s.to}${times}${st}`.trim());
+        }
+        if (segs.length > 5) lines.push(`... (${segs.length} segments)`);
+      }
+      if (opc) lines.push(`مهلة الإصدار (OPC): ${opc.date} ${opc.time}`);
+      if (docsOk) lines.push(`DOCS: موجود ✓`);
+      else if (header) lines.push(`DOCS: غير موجود ⚠`);
+      if (fp) lines.push(`الدفع FP: ${fp}`);
+      if (tix.length) lines.push(`تذاكر مرصودة: ${tix.slice(0,4).join(", ")}${tix.length>4 ? "..." : ""}`);
+      if (pricing.families.length) lines.push(`Fare Family: ${pricing.families.join(", ")}`);
+      if (pricing.max !== null) lines.push(`أعلى مبلغ ظاهر: SAR ${pricing.max.toFixed(2)}`);
 
-    return lines.length ? lines.join("\n") : "-";
+      return lines.length ? lines.join("\n") : "-";
+    } catch (e) {
+      console.warn("[Altea Coach] buildSummary error:", e);
+      return "-";
+    }
   }
 
   // ---- Suggestions ----
@@ -533,17 +614,24 @@
   }
 
   function validate(cmd, outText) {
-    const list = [];
-    // system errors -> show
-    for (const e of detectErrors(outText)) {
-      const hint = e.hint ? `خطأ بالنظام: ${e.hint}` : "خطأ بالنظام.";
-      const fix = (e.fix && e.fix.length) ? `الحل: ${e.fix.join(" ثم ")}` : "";
-      list.push([hint, fix].filter(Boolean).join(" | "));
+    try {
+      const list = [];
+      // system errors -> show
+      for (const e of detectErrors(outText)) {
+        const hint = e.hint ? `خطأ بالنظام: ${e.hint}` : "خطأ بالنظام.";
+        const fix = (e.fix && e.fix.length) ? `الحل: ${e.fix.join(" ثم ")}` : "";
+        list.push([hint, fix].filter(Boolean).join(" | "));
+      }
+      // minimal typed-command sanity:
+      if (/^RT\b/i.test(cmd) && cmd.length < 5) list.push("RT: ناقص رقم الحجز/التذكرة.");
+      if (/^TWD\b/i.test(cmd) && !/\d{3}-?\d{10}/.test(cmd) && !/\/L\d+/.test(cmd)) list.push("TWD: استخدم رقم تذكرة 065-XXXXXXXXXX أو /L#.");
+      if (/^NM\b/i.test(cmd) && !/\//.test(cmd)) list.push("NM: تأكد من وجود / بين الاسم العائلي والاسم الأول.");
+      if (/^FP\b/i.test(cmd) && cmd.length < 5) list.push("FP: ناقص طريقة الدفع (مثال: FP CASH أو FP SADAD).");
+      return list;
+    } catch (e) {
+      console.warn("[Altea Coach] validate error:", e);
+      return [];
     }
-    // minimal typed-command sanity:
-    if (/^RT\b/i.test(cmd) && cmd.length < 5) list.push("RT: ناقص رقم الحجز/التذكرة.");
-    if (/^TWD\b/i.test(cmd) && !/065-\d{10}/.test(cmd) && !/\/L\d+/.test(cmd)) list.push("TWD: استخدم رقم تذكرة 065-XXXXXXXXXX أو /L#.");
-    return list;
   }
 
   let scheduled = false;
